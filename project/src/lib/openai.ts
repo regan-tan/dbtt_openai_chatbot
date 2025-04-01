@@ -5,8 +5,22 @@ const openai = new OpenAI({
   dangerouslyAllowBrowser: true
 });
 
+// Hardcoded responses for specific questions
+const HARDCODED_RESPONSES: Record<string, string> = {
+  "What new seasonal bakes will I like?": "This spring season, in the month of April-May, you might like something fruity. Try out Elijah's classic favourites such as Wild Berry Lavender & Raspberry Ripple!",
+  "I'm feeling something chocolatey and comforting today.": "You might like our Nutella ($54.00), which happens to be one of our all-time favourites! Milo Marshmallow Pie ($59.00) may be comforting too. Go easy on the calories though!",
+  "Can I still get a whole pie by tomorrow?": "I've just checked the inventory in real-time. We have stocks available for every pie except for the Matchamisu Pie. Matchamisu Pie will be available only in mid-May!",
+  "What flavour should I get today?": "It's been 3 months since you last ordered the Sea Salt Nutella Tart – want one for this weekend?"
+};
+
 export const generateResponse = async (messages: { role: 'user' | 'assistant'; content: string }[]) => {
   try {
+    // Check if the last user message matches any hardcoded responses
+    const lastUserMessage = messages[messages.length - 1];
+    if (lastUserMessage.role === 'user' && HARDCODED_RESPONSES[lastUserMessage.content]) {
+      return HARDCODED_RESPONSES[lastUserMessage.content];
+    }
+
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: [
